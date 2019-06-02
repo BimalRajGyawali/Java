@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -343,6 +344,42 @@ public class EmployeeForm extends JFrame {
 	private JButton getBtnLoad() {
 		if (btnLoad == null) {
 			btnLoad = new JButton("Load");
+			btnLoad.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) 
+				{
+					
+					EmployeeService employeeService = new EmployeeServiceImpl();
+					
+					List<Employee> employees =  employeeService.getAllEmployees();
+					
+					DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+					
+					// empty the table first otherwise on every button click same data will repeatedly displayed
+					
+					tableModel.getDataVector().removeAllElements();
+					
+					for(Employee employee : employees)
+					{
+						tableModel.addRow(new Object[] {employee.getId(),employee.getFname(),employee.getLname(),employee.getGender()});
+					}
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+				}
+			});
 			btnLoad.setBounds(472, 442, 105, 25);
 		}
 		return btnLoad;
