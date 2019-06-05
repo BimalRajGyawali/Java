@@ -10,6 +10,7 @@ public interface EmployeeService
 	boolean addEmployee(Employee employee);
 	boolean deleteEmployee(int id);
 	boolean updateEmployee(Employee employee);
+	boolean doesExist(int id);
 	Employee getByID(int id);
 	List<Employee> getAllEmployees();
 
