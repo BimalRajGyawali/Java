@@ -2,13 +2,17 @@ package com.bway.swingproject.view;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Date;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,13 +24,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
 
 import com.bway.swingproject.model.Employee;
 import com.bway.swingproject.service.EmployeeService;
 import com.bway.swingproject.service.EmployeeServiceImpl;
-import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
 
 public class EmployeeForm extends JFrame {
@@ -58,6 +59,10 @@ public class EmployeeForm extends JFrame {
 	private JButton btnDelete;
 	private JDateChooser dateChooser;
 	private JDateChooser dateChooserJoiningDate;
+	private JButton btnUpdate;
+	private JTextField textFieldSearch;
+	private JButton btnSearch;
+	private JLabel lblIcon;
 
 	/**
 	 * Launch the application.
@@ -67,7 +72,7 @@ public class EmployeeForm extends JFrame {
 			public void run() {
 				try {
 					EmployeeForm frame = new EmployeeForm();
-					frame.setVisible(true);
+				    frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -88,8 +93,8 @@ public class EmployeeForm extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		contentPane.add(getLblFirstName());
-		contentPane.add(getTxtFirstName());
 		contentPane.add(getLblLastName());
+		contentPane.add(getTxtFirstName());
 		contentPane.add(getTxtLastName());
 		contentPane.add(getLblPhone());
 		contentPane.add(getTxtPhone());
@@ -111,6 +116,12 @@ public class EmployeeForm extends JFrame {
 		contentPane.add(getBtnDelete());
 		contentPane.add(getDateChooser());
 		contentPane.add(getDateChooserJoiningDate());
+		contentPane.add(getBtnUpdate());
+		
+		displayTable(table);
+		contentPane.add(getTextFieldSearch());
+		contentPane.add(getBtnSearch());
+		contentPane.add(getLblIcon());
 	}
 	private JLabel getLblFirstName() {
 		if (lblFirstName == null) {
@@ -275,7 +286,22 @@ public class EmployeeForm extends JFrame {
 					
 					
 					
+					// empty the input fields
 					
+					txtFirstName.setText("");
+					txtLastName.setText("");
+					txtPhone.setText("");
+					txtSalary.setText("");
+					
+					buttonGroup.clearSelection();
+					comboBoxPost.setSelectedIndex(0);
+					
+					
+					dateChooser.setCalendar(null);
+					dateChooserJoiningDate.setCalendar(null);
+					
+					
+					displayTable(table);
 					
 					
 					
@@ -312,12 +338,12 @@ public class EmployeeForm extends JFrame {
 	private JScrollPane getScrollPane() {
 		if (scrollPane == null) {
 			scrollPane = new JScrollPane();
-			scrollPane.setBounds(384, 63, 476, 343);
+			scrollPane.setBounds(387, 116, 476, 343);
 			scrollPane.setViewportView(getTable());
 		}
 		return scrollPane;
 	}
-	private JTable getTable() {
+	public JTable getTable() {
 		if (table == null) {
 			table = new JTable();
 			table.setModel(new DefaultTableModel(
@@ -348,27 +374,9 @@ public class EmployeeForm extends JFrame {
 				public void actionPerformed(ActionEvent arg0) 
 				{
 					
-					EmployeeService employeeService = new EmployeeServiceImpl();
-					
-					List<Employee> employees =  employeeService.getAllEmployees();
-					
-					DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-					
-					// empty the table first otherwise on every button click same data will repeatedly displayed
-					
-					tableModel.getDataVector().removeAllElements();
-					
-					for(Employee employee : employees)
-					{
-						tableModel.addRow(new Object[] {employee.getId(),employee.getFname(),employee.getLname(),employee.getGender()});
-					}
 					
 					
-					
-					
-					
-					
-					
+				   displayTable(table);
 					
 					
 					
@@ -380,14 +388,48 @@ public class EmployeeForm extends JFrame {
 					
 				}
 			});
-			btnLoad.setBounds(472, 442, 105, 25);
+			btnLoad.setBounds(475, 495, 105, 25);
 		}
 		return btnLoad;
 	}
 	private JButton getBtnDelete() {
 		if (btnDelete == null) {
 			btnDelete = new JButton("Delete");
-			btnDelete.setBounds(755, 442, 105, 25);
+			btnDelete.addActionListener(new ActionListener() {
+				
+				public void actionPerformed(ActionEvent arg0) {
+					
+					
+					// deleting by selecting the row
+					if(table.getSelectedRow() < 0)
+					{
+						JOptionPane.showMessageDialog(null, "Select any row");
+						return ;
+					}
+					
+					
+				 int row = table.getSelectedRow();
+				 
+				 DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+				 
+				 int id = (int) tableModel.getValueAt(row, 0);
+				 
+				 EmployeeService employeeService = new EmployeeServiceImpl();
+				 
+				 Employee employee = employeeService.getByID(id);
+				 
+				 new ConfirmDeleteView(employee,table).setVisible(true);
+				 
+				 
+					
+					
+					
+					
+					
+					
+				}
+			});
+			btnDelete.setBounds(758, 495, 105, 25);
 		}
 		return btnDelete;
 	}
@@ -404,5 +446,145 @@ public class EmployeeForm extends JFrame {
 			dateChooserJoiningDate.setBounds(141, 426, 151, 19);
 		}
 		return dateChooserJoiningDate;
+	}
+	
+	
+	public void displayTable(JTable table)
+	{
+		EmployeeService employeeService = new EmployeeServiceImpl();
+		
+		List<Employee> employees =  employeeService.getAllEmployees();
+		
+		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+		
+		// empty the table first otherwise on every button click same data will repeatedly displayed
+		
+		tableModel.setRowCount(0);
+		
+		for(Employee employee : employees)
+		{
+			tableModel.addRow(new Object[] {employee.getId(),employee.getFname(),employee.getLname(),employee.getGender()});
+		}
+		
+		
+	}
+	private JButton getBtnUpdate() {
+		if (btnUpdate == null) {
+			btnUpdate = new JButton("Update");
+			btnUpdate.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					
+					if (table.getSelectedRow()<0) {
+						
+						JOptionPane.showMessageDialog(null, "Select any row");
+						return;
+					}
+					
+					int row = table.getSelectedRow();
+					
+					
+					DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+					
+					int id = (int) tableModel.getValueAt(row, 0);
+					
+					
+					
+					UpdateEmployeeView updateEmployeeView = new UpdateEmployeeView(table);
+					updateEmployeeView.setData(id);
+					updateEmployeeView.setVisible(true);
+					
+					
+					
+					
+					
+					
+					
+					
+				}
+			});
+			btnUpdate.setBounds(606, 495, 105, 25);
+		}
+		return btnUpdate;
+	}
+	public JTextField getTextFieldSearch() {
+		if (textFieldSearch == null) {
+			textFieldSearch = new JTextField();
+			textFieldSearch.setBounds(387, 67, 273, 23);
+			textFieldSearch.setColumns(10);
+		}
+	
+		return textFieldSearch;
+	}
+	public JButton getBtnSearch() {
+		if (btnSearch == null) {
+			btnSearch = new JButton("Search");
+			btnSearch.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					
+					
+					if(textFieldSearch.getText().isEmpty())
+					{
+						JOptionPane.showMessageDialog(null, "Please enter id");
+						return;
+					}
+					
+					try {
+						
+						int id = Integer.parseInt(textFieldSearch.getText());
+						
+			            EmployeeService employeeService = new EmployeeServiceImpl();
+			            
+			            if(employeeService.doesExist(id) == false)
+			            {
+			            	JOptionPane.showMessageDialog(null, "id "+id+" does not exist");
+			            	return;
+			            }
+			            
+						Employee employee = employeeService.getByID(id);
+						
+						DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+						
+						tableModel.setRowCount(0);
+						
+						tableModel.addRow(new Object[] {
+								
+								employee.getId() , employee.getFname(), employee.getLname(),employee.getGender()
+								
+						});
+						
+						
+						
+						
+						
+						
+						
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(null, "Id should be in number");
+					
+					}
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+				}
+			});
+			btnSearch.setBounds(713, 66, 105, 25);
+		}
+		return btnSearch;
+	}
+	public JLabel getLblIcon() {
+		if (lblIcon == null) {
+			lblIcon = new JLabel("New label");
+			lblIcon.setBounds(387, 67, 58, 19);
+		}
+		
+		
+		return lblIcon;
 	}
 }
