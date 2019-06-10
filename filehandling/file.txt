@@ -1,0 +1,2 @@
+FileWriter writes
+in form of char array
