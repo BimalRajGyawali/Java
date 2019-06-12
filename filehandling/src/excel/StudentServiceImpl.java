@@ -10,12 +10,12 @@ import java.sql.SQLIntegrityConstraintViolationException;
 public class StudentServiceImpl implements StudentService
 {
 	public Connection con;
-	public BufferedReader bufferedReader;
 	
-	public  StudentServiceImpl(BufferedReader bufferedReader) {
+	
+	public  StudentServiceImpl()) {
 		
 		con = DB.getConnection();
-		this.bufferedReader = bufferedReader;
+		
 	}
 
 	@Override

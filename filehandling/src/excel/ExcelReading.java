@@ -35,7 +35,7 @@ public class ExcelReading
 		  student.setGender(rowValues[6]);
 		  
 		  
-		  StudentService studentService = new StudentServiceImpl(bufferedReader);
+		  StudentService studentService = new StudentServiceImpl();
 		  
 		  studentService.addStudent(student);		
 
