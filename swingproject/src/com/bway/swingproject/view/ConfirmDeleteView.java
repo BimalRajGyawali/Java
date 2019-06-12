@@ -1,9 +1,13 @@
 package com.bway.swingproject.view;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
@@ -11,13 +15,6 @@ import javax.swing.border.EmptyBorder;
 import com.bway.swingproject.model.Employee;
 import com.bway.swingproject.service.EmployeeService;
 import com.bway.swingproject.service.EmployeeServiceImpl;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JButton;
-import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class ConfirmDeleteView extends JFrame {
 

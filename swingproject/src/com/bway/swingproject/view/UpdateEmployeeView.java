@@ -1,28 +1,25 @@
 package com.bway.swingproject.view;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Date;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
+import javax.swing.border.EmptyBorder;
 
 import com.bway.swingproject.model.Employee;
 import com.bway.swingproject.service.EmployeeService;
 import com.bway.swingproject.service.EmployeeServiceImpl;
 import com.toedter.calendar.JDateChooser;
-import javax.swing.JButton;
-import java.awt.Font;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class UpdateEmployeeView extends JFrame {
 

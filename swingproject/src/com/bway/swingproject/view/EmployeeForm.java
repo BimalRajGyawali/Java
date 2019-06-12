@@ -2,17 +2,22 @@ package com.bway.swingproject.view;
 
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -29,6 +34,8 @@ import com.bway.swingproject.model.Employee;
 import com.bway.swingproject.service.EmployeeService;
 import com.bway.swingproject.service.EmployeeServiceImpl;
 import com.toedter.calendar.JDateChooser;
+
+import sun.tools.tree.FinallyStatement;
 
 public class EmployeeForm extends JFrame {
 
@@ -63,22 +70,10 @@ public class EmployeeForm extends JFrame {
 	private JTextField textFieldSearch;
 	private JButton btnSearch;
 	private JLabel lblIcon;
+	private JButton btnReadFile;
+	private JButton btnHide;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					EmployeeForm frame = new EmployeeForm();
-				    frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+
 
 	/**
 	 * Create the frame.
@@ -122,6 +117,8 @@ public class EmployeeForm extends JFrame {
 		contentPane.add(getTextFieldSearch());
 		contentPane.add(getBtnSearch());
 		contentPane.add(getLblIcon());
+		contentPane.add(getBtnReadFile());
+		contentPane.add(getBtnHide());
 	}
 	private JLabel getLblFirstName() {
 		if (lblFirstName == null) {
@@ -511,6 +508,43 @@ public class EmployeeForm extends JFrame {
 			textFieldSearch = new JTextField();
 			textFieldSearch.setBounds(387, 67, 273, 23);
 			textFieldSearch.setColumns(10);
+			
+			
+			textFieldSearch.addKeyListener(new KeyAdapter() {
+				
+				public void keyPressed(KeyEvent e)
+				{
+					String input = textFieldSearch.getText();
+					
+					EmployeeService employeeService = new EmployeeServiceImpl();
+					
+					List<Employee> employees =  employeeService.searchEmployees(input);
+					
+					DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+					
+					tableModel.setRowCount(0);
+					
+					for(Employee employee : employees)
+					{
+						tableModel.addRow(new Object[] {
+								
+								employee.getId(),employee.getFname(),employee.getLname(),employee.getGender()
+								
+						});
+					}
+					
+					
+					
+					
+					
+					
+					
+					
+					
+				}
+ 				
+			});
+			
 		}
 	
 		return textFieldSearch;
@@ -586,5 +620,117 @@ public class EmployeeForm extends JFrame {
 		
 		
 		return lblIcon;
+	}
+	public JButton getBtnReadFile() {
+		if (btnReadFile == null) {
+			btnReadFile = new JButton("Read File");
+			btnReadFile.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					
+					
+					JFileChooser fileChooser = new JFileChooser();
+				    fileChooser.showOpenDialog(null); // show() is depreciated
+				    
+				    BufferedReader bufferedReader = null;
+				    
+				    try {
+				    	    bufferedReader = new BufferedReader(
+								new FileReader(fileChooser.getSelectedFile()));
+						
+						
+				    	    bufferedReader.readLine();
+				    	    String row;
+				    	    
+				    	    while((row = bufferedReader.readLine()) != null)
+				    	    {
+				    	    
+				    	              String[] rowValues = row.split(",");
+				    	              
+				    	              Employee  employee = new Employee();
+				    	              
+				    	              employee.setFname(rowValues[0]);
+				    	              employee.setLname(rowValues[1]);
+				    	              employee.setPhone(rowValues[2]);
+				    	              employee.setGender(rowValues[3]);
+				    	              employee.setPost(rowValues[4]);
+				    	              
+				    	              EmployeeService employeeService = new EmployeeServiceImpl();
+				    	              
+				    	              employeeService.addEmployee(employee);
+				    	              
+				    	    
+				    	    }
+						
+						
+						
+						
+						
+						
+					} catch (FileNotFoundException e) {
+					
+						e.printStackTrace();
+					}
+				    
+				    catch (Exception e) {
+					 
+				    	e.printStackTrace();
+					}
+				    
+				    finally
+				    {
+				    	try {
+							bufferedReader.close();
+						} catch (IOException e) {
+							
+							e.printStackTrace();
+						}
+				    }
+				    
+				    
+					
+				    
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+				}
+			});
+			btnReadFile.setBounds(241, 536, 105, 25);
+		}
+		return btnReadFile;
+	}
+	public JButton getBtnHide() {
+		if (btnHide == null) {
+			btnHide = new JButton("Hide");
+			btnHide.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					
+		           DefaultTableModel tableModel =   (DefaultTableModel) table.getModel();
+		           
+		           tableModel.setRowCount(0);
+				}
+			});
+			btnHide.setBounds(358, 495, 105, 25);
+		}
+		return btnHide;
 	}
 }

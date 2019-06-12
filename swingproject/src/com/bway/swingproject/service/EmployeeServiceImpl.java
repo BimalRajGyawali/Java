@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -254,6 +255,140 @@ public class EmployeeServiceImpl implements EmployeeService
 		
 		return false;
 	}
+
+	@Override
+	public List<Employee> searchEmployees(String input) 
+	{
+		
+
+		List <Employee> employees = new ArrayList<>();
+		
+		
+		//String sql = "select * from employee where fname like '%"+input+"%' ";
+		
+		String sql = "select * from employee where fname like ?";
+		
+		try {
+			   PreparedStatement stmt = con.prepareStatement(sql);
+			   stmt.setString(1, "%"+input+"%");
+			   
+			
+		       ResultSet resultSet = stmt.executeQuery();
+		       
+		       while(resultSet.next())
+		       {
+		    	   Employee employee = new Employee();
+		    	   employee.setId(resultSet.getInt("id"));
+		    	   employee.setFname(resultSet.getString("fname"));
+		    	   employee.setLname(resultSet.getString("lname"));
+		    	   employee.setPhone(resultSet.getString("phone"));
+		    	   employee.setSalary(resultSet.getDouble("salary"));
+		    	   employee.setPost(resultSet.getString("post"));
+		    	   employee.setDateOfBirth(resultSet.getDate("dateofbirth"));
+		    	   employee.setDateOfJoining(resultSet.getDate("dateofjoining"));
+		    	   employee.setGender(resultSet.getString("gender"));
+		    	   
+		    	   employees.add(employee);
+		    	   
+		       }
+			   
+			
+			
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		
+		return employees;
+		
+		
+		
+		
+	
+	  
 	
 
+	}
+
+	@Override
+	public boolean isUserVerified(String username, String password) {
+		
+		
+		String sql = "select password from login where username = ?";
+		
+		try {
+			   PreparedStatement stmt = con.prepareStatement(sql);
+			   stmt.setString(1, username);
+			   
+			   ResultSet resultSet = stmt.executeQuery();
+			   
+			   if(resultSet.next())
+			   {
+				  
+				   
+				   if(password.equals(resultSet.getString("password")))
+						   {
+					             return true;
+						   }
+			   }
+			   
+			   
+			  
+			
+			
+			
+		} catch (SQLException e) {
+					e.printStackTrace();
+		}
+		
+		
+		
+		
+		
+		
+		
+		return false;
+	}
+
+	@Override
+	public boolean signUp(String username, String password) {
+		
+		String sql = "insert into login(username,password) values(?,?)";
+		
+		try {
+			   PreparedStatement stmt = con.prepareStatement(sql);
+			   
+			   stmt.setString(1, username);
+			   stmt.setString(2,password);
+			   
+			   stmt.execute();
+			   
+			   return true;
+			
+			
+			
+			
+		} 
+		
+		catch (SQLIntegrityConstraintViolationException e) {
+			JOptionPane.showMessageDialog(null, "Username already taken ");
+		} 
+		
+		
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		return false;
+	}
+	
 }
+	

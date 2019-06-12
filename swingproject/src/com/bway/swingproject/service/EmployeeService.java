@@ -11,7 +11,10 @@ public interface EmployeeService
 	boolean deleteEmployee(int id);
 	boolean updateEmployee(Employee employee);
 	boolean doesExist(int id);
+	boolean isUserVerified(String username,String password);
+	boolean signUp(String username,String password);
 	Employee getByID(int id);
 	List<Employee> getAllEmployees();
+    List<Employee> searchEmployees(String input);
 
 }
