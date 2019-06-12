@@ -35,33 +35,16 @@ public class ExcelReading
 		  student.setGender(rowValues[6]);
 		  
 		  
-		  StudentService studentService = new StudentServiceImpl();
+		  StudentService studentService = new StudentServiceImpl(bufferedReader);
 		  
-		  if(studentService.addStudent(student))
-		  {
-			  System.out.println("Student Added Successfully");
-		  }
-		  
-		  
-		  else {
-			
-			  System.out.println("Student Added UnSuccessful");
-		}
-		  
-		
+		  studentService.addStudent(student);		
 
 		  
 		  
 	  }
 	  
 	  
-	  
-	  
-	  
-	  
-	  
-	  
-		bufferedReader.close();
+	     bufferedReader.close();
 	}
 
 }

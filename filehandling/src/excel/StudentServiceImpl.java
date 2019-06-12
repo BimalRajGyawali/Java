@@ -1,20 +1,25 @@
 package excel;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 public class StudentServiceImpl implements StudentService
 {
 	public Connection con;
+	public BufferedReader bufferedReader;
 	
-	public  StudentServiceImpl() {
+	public  StudentServiceImpl(BufferedReader bufferedReader) {
 		
 		con = DB.getConnection();
+		this.bufferedReader = bufferedReader;
 	}
 
 	@Override
-	public boolean addStudent(Student student) {
+	public boolean addStudent(Student student)  {
 		
 		String sqlQuery = "insert into studentexcel("
 				+ "id,fname,lname,phone,address,college,gender)"
@@ -22,9 +27,11 @@ public class StudentServiceImpl implements StudentService
 		
 		
 		try {
+			  
 			  PreparedStatement stmt = con.prepareStatement(sqlQuery);
-			 
-			  stmt.setInt(1,student.getId() );
+			
+			  
+			  stmt.setInt(1,student.getId() );  
 			  stmt.setString(2, student.getFname());
 			  stmt.setString(3, student.getLname());
 			  stmt.setString(4, student.getPhone());
@@ -33,12 +40,19 @@ public class StudentServiceImpl implements StudentService
 			  stmt.setString(7, student.getGender());
 			
 			  stmt.execute();
+			  //stmt.execute() throws SQLIntegrityConstraintViolationException
+			  // if id(PK) is repeated. This happens when same content is read
+			  // more than once
 			
 			
 			  return true;
 			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+		} catch (SQLIntegrityConstraintViolationException e) {
+		
+			// we are ignoring the repeated values without any messages
+		}
+		
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
